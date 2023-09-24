@@ -34,13 +34,6 @@ const fetchDataAsyncAwait = async (fileName) => {
     }
 };
 
-// console results
-/*(async () => {
-    const rootPhrase = await fetchDataAsyncAwait(fileName);
-    console.log(`Root phrase using async/away and arrow function  - "${rootPhrase}"`);
-})();
-*/
-
 // 2 method
 let resultFromThen;
 function fetchDataThen(fileName) {
@@ -75,15 +68,6 @@ function fetchDataThen(fileName) {
             return '';
         });
 }
-
-// console results
-/*
-fetchDataThen(fileName)
-    .then((rootPhraseThen) => {
-        resultFromThen = rootPhraseThen;
-        console.log(`Root phrase using .then and function declaration - "${rootPhraseThen}"`);
-    });
-*/
 
 // Logic for modal windows
 const modal = document.querySelector('.modal');
