@@ -3,71 +3,80 @@
 const baseUrl = 'https://fe.it-academy.by/Examples/words_tree/';
 const fileName = 'root.txt';
 
-// 1 method
+const returnData = function (data) {
+    if (data.startsWith('[')) {
+        const fileNames = JSON.parse(data);
+        let result = '';
+
+        const fetchPromises = fileNames.map((fileName) => {
+            return fetchDataThen(fileName);
+        });
+        return Promise.all(fetchPromises)
+            .then((fileDataArray) => {
+                result = fileDataArray.join(' ');
+                return result;
+            });
+    }
+    return data;
+}
+
+// 1 method AsyncAwait 
 const fetchDataAsyncAwait = async (fileName) => {
     try {
         const url = baseUrl + fileName;
         const response = await fetch(url);
-
         if (!response.ok) {
             throw new Error(`Error fetching data from ${url}`);
         }
-
         const data = await response.text();
-
-        if (data.startsWith('[')) {
-            const fileNames = JSON.parse(data);
-            let result = '';
-
-            for (const fileName of fileNames) {
-                const fileData = await fetchDataAsyncAwait(fileName);
-                result += `${fileData} `;
-            }
-
-            return result;
-        }
-
-        return data;
+        return returnData(data)
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         return '';
     }
 };
 
-// 2 method
-let resultFromThen;
+// console results
+/*
+(async () => {
+    try {
+        const rootPhrase = await fetchDataAsyncAwait(fileName);
+        console.log(`Root phrase using using async/await and arrow function - "${rootPhrase}"`);
+    } catch (error) {
+        console.error(`Error occurred - "${error.message}"`);
+    }
+})();
+*/
+
+// 2 method Then
 function fetchDataThen(fileName) {
     const url = baseUrl + fileName;
     return fetch(url)
-        .then((response) => {
+        .then(response => {
             if (!response.ok) {
                 throw new Error(`Error fetching data from ${url}`);
             }
             return response.text();
         })
-        .then((data) => {
-            if (data.startsWith('[')) {
-                const fileNames = JSON.parse(data);
-                let result = '';
-
-                const fetchPromises = fileNames.map((fileName) => {
-                    return fetchDataThen(fileName);
-                });
-
-                return Promise.all(fetchPromises)
-                    .then((fileDataArray) => {
-                        result = fileDataArray.join(' ');
-                        return result;
-                    });
-            }
-
-            return data;
-        })
-        .catch((error) => {
+        .then(data => returnData(data))
+        .catch(error => {
             console.error(error);
             return '';
         });
 }
+
+// console results
+/*
+(function () {
+    fetchDataThen(fileName)
+        .then(function (rootPhraseThen) {
+            console.log(`Root phrase using .then and function declaration - "${rootPhraseThen}"`);
+        })
+        .catch(function (error) {
+            console.error(`Error occurred - "${error.message}"`);
+        })
+})()
+*/
 
 // Logic for modal windows
 const modal = document.querySelector('.modal');
